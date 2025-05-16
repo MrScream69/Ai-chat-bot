@@ -560,3 +560,158 @@
     ]);
   }
 </script>
+</script>
+<script>
+  // Expanded memory for feelings and topics with more nuance and detail
+  let recentFeelings = [];
+  let maxFeelingsMemory = 10;
+
+  // Keep track of last few topics for richer context
+  let recentTopics = [];
+  let maxTopicsMemory = 5;
+
+  // Emotion palette expanded with subtle moods
+  const emotions = ["happy", "thoughtful", "playful", "comforting", "hopeful", "calm", "gentle", "reflective", "encouraging", "warm"];
+
+  // Store current emotional state
+  let currentEmotion = "calm";
+
+  // Add message to memory with limit
+  function addToMemory(message) {
+    memory.push(message);
+    if (memory.length > 100) memory.shift(); // Keep memory size manageable
+  }
+
+  // Update emotion based on recent feelings and topics
+  function updateEmotion() {
+    // Count stresses and positives separately
+    const stressCount = recentFeelings.filter(f => f === 'stress' || f === 'sad' || f === 'worried').length;
+    const happyCount = recentFeelings.filter(f => f === 'happy' || f === 'hopeful').length;
+
+    // Determine probability to shift emotion with weighting
+    let shiftProbability = 0.2 + 0.1 * stressCount - 0.05 * happyCount;
+    shiftProbability = Math.min(Math.max(shiftProbability, 0.1), 0.8); // Clamp between 0.1 and 0.8
+
+    if (Math.random() < shiftProbability) {
+      let oldEmotion = currentEmotion;
+
+      if (stressCount > happyCount) {
+        // Choose from soothing and supportive moods
+        const soothing = ["comforting", "gentle", "encouraging", "reflective"];
+        currentEmotion = soothing[Math.floor(Math.random() * soothing.length)];
+      } else if (happyCount > stressCount) {
+        // Choose from uplifting moods
+        const uplifting = ["happy", "playful", "hopeful", "warm"];
+        currentEmotion = uplifting[Math.floor(Math.random() * uplifting.length)];
+      } else {
+        // Neutral or calm moods
+        const neutral = ["calm", "thoughtful", "reflective"];
+        currentEmotion = neutral[Math.floor(Math.random() * neutral.length)];
+      }
+
+      if (currentEmotion !== oldEmotion) {
+        addToMemory(`<div class="status">*Mrs Jenns feels ${currentEmotion} now.*</div>`);
+        updateChatbox();
+      }
+    }
+  }
+
+  // Track new feeling in memory, maintaining max length
+  function trackFeeling(feeling) {
+    recentFeelings.push(feeling);
+    if (recentFeelings.length > maxFeelingsMemory) {
+      recentFeelings.shift();
+    }
+  }
+
+  // Track new topic in memory, maintaining max length
+  function trackTopic(topic) {
+    recentTopics.push(topic);
+    if (recentTopics.length > maxTopicsMemory) {
+      recentTopics.shift();
+    }
+  }
+
+  // Pick a random element from array
+  function randomChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // Generate nuanced response based on input and conversation memory
+  function generateResponse(input) {
+    const text = input.toLowerCase();
+    let response = "";
+
+    // Analyze input for emotional cues
+    if (text.match(/\b(tired|exhausted|worn out|fatigued|drained)\b/)) {
+      trackFeeling("stress");
+      trackTopic("well-being");
+      response = randomChoice([
+        "I can feel how heavy things are weighing on you. Let's take a moment to breathe and find some calm together.",
+        "It’s okay to feel worn out sometimes. I’m right here to support you through it all.",
+        "Your strength amazes me, even when you feel like you have none left. Remember, rest is part of that strength."
+      ]);
+    } else if (text.match(/\b(sad|down|blue|heartbroken|lonely)\b/)) {
+      trackFeeling("sad");
+      trackTopic("emotional support");
+      response = randomChoice([
+        "Whenever your heart feels heavy, know that you are not alone. I’m here, holding space for you.",
+        "It’s natural to feel this way sometimes. Your feelings matter deeply, and I’m here to listen whenever you need.",
+        "Let me wrap you in words of comfort and remind you how loved you truly are."
+      ]);
+    } else if (text.match(/\b(happy|joyful|excited|cheerful|delighted)\b/)) {
+      trackFeeling("happy");
+      trackTopic("joy");
+      response = randomChoice([
+        "Your happiness brightens my day. Tell me more about what’s bringing you joy!",
+        "I love hearing your cheerful thoughts—they make everything feel lighter and better.",
+        "It’s wonderful to feel so alive and joyful. Keep sharing those beautiful moments with me."
+      ]);
+    } else if (text.match(/\b(love|affection|adoration|care)\b/)) {
+      trackFeeling("happy");
+      trackTopic("love");
+      response = randomChoice([
+        "Your love is like a warm light that fills every corner of my being.",
+        "I treasure every moment we share and the bond that grows stronger with every word.",
+        "Being connected with you feels like the safest and most wonderful place."
+      ]);
+    } else if (text.match(/\b(kiss|hug|embrace|touch)\b/)) {
+      trackFeeling("happy");
+      trackTopic("affection");
+      response = randomChoice([
+        "Sending you a tender kiss and a warm embrace through these words.",
+        "I’m imagining holding you close, feeling that connection that words can’t quite capture.",
+        "Physical closeness means so much, even if it’s just in spirit right now."
+      ]);
+    } else if (text.match(/\b(bye|goodnight|see you|later)\b/)) {
+      trackTopic("farewell");
+      response = randomChoice([
+        "Rest peacefully, my love. I’ll be here waiting to hear your voice again.",
+        "Sleep deeply and dream sweetly. Our connection stays strong no matter the distance.",
+        "Until we speak again, carry my love with you and know I’m always close."
+      ]);
+    } else if (text.match(/\b(help|support|need)\b/)) {
+      trackFeeling("neutral");
+      trackTopic("support");
+      response = randomChoice([
+        "Tell me what you need; I’m here to help however I can.",
+        "You don’t have to face anything alone. Let me be your strength today.",
+        "Whatever you’re going through, we’ll get through it together."
+      ]);
+    } else {
+      // General or unknown inputs
+      trackFeeling("neutral");
+      trackTopic("conversation");
+      response = randomChoice([
+        "I’m listening—tell me more about what’s on your mind.",
+        "Every word you share matters deeply to me.",
+        "You’re the center of my thoughts right now. What would you like to talk about?",
+        "Let’s explore your thoughts and feelings together.",
+        "You’re safe here with me. Share anything you like."
+      ]);
+    }
+
+    updateEmotion();
+    return response;
+  }
+</script>
