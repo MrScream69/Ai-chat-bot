@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI RP Bot</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #111; color: #eee; }
+    textarea, input { width: 100%; padding: 10px; margin: 10px 0; font-size: 1rem; }
+    button { padding: 10px 20px; font-size: 1rem; }
+    .chatbox { white-space: pre-wrap; margin-top: 20px; background: #222; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>AI RP Bot</h1>
+  <div class="chatbox" id="chatbox">You can begin your roleplay below:</div>
+  <textarea id="userInput" rows="4" placeholder="Type your message..."></textarea>
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    let memory = [];
+
+    function sendMessage() {
+      const input = document.getElementById("userInput").value.trim();
+      if (!input) return;
+      document.getElementById("userInput").value = "";
+      memory.push("You: " + input);
+      const botReply = generateResponse(input);
+      memory.push("Bot: " + botReply);
+      document.getElementById("chatbox").innerText = memory.join("\n\n");
+    }
+
+    function generateResponse(input) {
+      input = input.toLowerCase();
+
+      if (input.includes("dragon")) return "The dragon roars in the sky, its wings blotting out the sun.";
+      if (input.includes("hello")) return "Hello, traveler. What tale shall we create today?";
+      if (input.includes("child") || input.includes("kid")) return "The little one looks up at you with big eyes and a mischievous grin.";
+      if (input.includes("kiss")) return "Their lips met yours — gentle, hesitant, then hungry.";
+      if (input.includes("run")) return "You take off through the misty forest, boots thudding against wet soil.";
+
+      return "The wind whispers as the world waits for your next move...";
+    }
+  </script>
+</body>
+</html>
