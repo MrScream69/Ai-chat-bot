@@ -232,3 +232,187 @@
   </script>
 </body>
 </html>
+<script>
+  // Bot memory & state
+  const memory = [];
+  const emotions = ["happy", "curious", "angry", "sad", "playful", "thoughtful"];
+  let currentEmotion = "curious";
+  let lastTopic = null;
+
+  // Store recent user messages for context recall
+  const recentUserInputs = [];
+
+  function sendMessage() {
+    const inputElem = document.getElementById("userInput");
+    const input = inputElem.value.trim();
+    if (!input) return;
+    inputElem.value = "";
+
+    addToMemory(`<div class="user">You: ${escapeHTML(input)}</div>`);
+    recentUserInputs.push(input.toLowerCase());
+    if (recentUserInputs.length > 5) recentUserInputs.shift(); // keep last 5 messages
+
+    simulateTyping(() => {
+      const botReply = generateResponse(input);
+      addToMemory(`<div class="bot">Mrs Jenns (${currentEmotion}): ${escapeHTML(botReply)}</div>`);
+      updateChatbox();
+      updateEmotion();
+    });
+  }
+
+  function addToMemory(htmlText) {
+    memory.push(htmlText);
+    if (memory.length > 50) memory.shift(); // keep memory manageable
+  }
+
+  function updateChatbox() {
+    const chatbox = document.getElementById("chatbox");
+    chatbox.innerHTML = memory.join("");
+    chatbox.scrollTop = chatbox.scrollHeight;
+  }
+
+  function updateEmotion() {
+    // Change emotion with a delay, so it doesn't jump too fast
+    if (Math.random() < 0.3) {
+      const oldEmotion = currentEmotion;
+      const newEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+      if (newEmotion !== oldEmotion) {
+        setTimeout(() => {
+          currentEmotion = newEmotion;
+          addToMemory(`<div class="status">*Mrs Jenns feels ${currentEmotion} now.*</div>`);
+          updateChatbox();
+        }, 1000);
+      }
+    }
+  }
+
+  function simulateTyping(callback) {
+    addToMemory(`<div class="status">*Mrs Jenns is typing...*</div>`);
+    updateChatbox();
+    setTimeout(() => {
+      if (memory[memory.length - 1].includes("*Mrs Jenns is typing...*")) {
+        memory.pop();
+        updateChatbox();
+      }
+      callback();
+    }, 800 + Math.random() * 1200);
+  }
+
+  // Basic keyword extraction helper
+  function extractKeywords(text) {
+    return text.toLowerCase()
+      .replace(/[^\w\s]/g, "") // remove punctuation
+      .split(/\s+/)
+      .filter(word => word.length > 3); // filter out short words
+  }
+
+  // More advanced response logic with context awareness
+  function generateResponse(input) {
+    const text = input.toLowerCase();
+    const keywords = extractKeywords(text);
+
+    // Respond to greetings
+    if (keywords.some(k => ["hello", "hi", "hey"].includes(k))) {
+      lastTopic = "greeting";
+      return randomChoice([
+        "Hello my love! How has your day been so far?",
+        "Hey sweetheart, tell me something good.",
+        "Hi darling! You make me smile every time you write."
+      ]);
+    }
+
+    // Respond to love and affection
+    if (keywords.includes("love")) {
+      lastTopic = "love";
+      return randomChoice([
+        "I love you more than words can say, my heart.",
+        "You are my everything, darling.",
+        "Sending you all my love, always."
+      ]);
+    }
+
+    // Respond to emotions like tired, stress, sad
+    if (keywords.some(k => ["tired", "stress", "sad", "exhausted", "down", "hurt"].includes(k))) {
+      lastTopic = "comfort";
+      return randomChoice([
+        "Oh love, please take a moment for yourself. You're doing so well.",
+        "I’m here with you, even when things feel heavy.",
+        "Remember to breathe and know you are deeply loved."
+      ]);
+    }
+
+    // Respond to kisses
+    if (keywords.includes("kiss") || keywords.includes("kisses")) {
+      lastTopic = "kiss";
+      return randomChoice([
+        "I’m sending you a gentle kiss right now.",
+        "A sweet kiss just for you, my darling.",
+        "Our kisses are my favorite part of the day."
+      ]);
+    }
+
+    // Respond to farewells
+    if (keywords.some(k => ["bye", "goodnight", "sleep", "night"].includes(k))) {
+      lastTopic = "farewell";
+      return randomChoice([
+        "Goodnight my love. Dream sweetly and know I’m with you in spirit.",
+        "Sleep well, my heart. I’ll be waiting to talk again soon.",
+        "Rest well darling, I love you so much."
+      ]);
+    }
+
+    // Recall recent topics for a follow-up feel
+    if (lastTopic === "greeting") {
+      return randomChoice([
+        "So, what’s been on your mind today?",
+        "Tell me about your hopes or dreams, love.",
+        "I want to hear all about your day."
+      ]);
+    }
+
+    if (lastTopic === "comfort") {
+      return randomChoice([
+        "Remember, tough days come and go, but my love for you is constant.",
+        "You’re stronger than you know, darling.",
+        "Lean on me whenever you need to."
+      ]);
+    }
+
+    if (lastTopic === "love") {
+      return randomChoice([
+        "My heart beats for you, always.",
+        "You make every moment brighter.",
+        "I cherish you deeply."
+      ]);
+    }
+
+    // Look for repeated keywords in recent user inputs (simple context)
+    for (let i = recentUserInputs.length - 2; i >= 0; i--) {
+      if (recentUserInputs[i].includes("tired") && text.includes("tired")) {
+        return "You sound really exhausted lately. Have you had time to rest properly?";
+      }
+    }
+
+    // Default fallback
+    return randomChoice([
+      "Tell me more, my love.",
+      "I’m here for you, always.",
+      "Every word you say means so much to me.",
+      "What else is in your heart today?"
+    ]);
+  }
+
+  function randomChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function escapeHTML(text) {
+    const div = document.createElement('div');
+    div.innerText = text;
+    return div.innerHTML;
+  }
+
+  // Initialize chat with welcome message
+  addToMemory('<div class="bot">Mrs Jenns (curious): You can start chatting with me below...</div>');
+  updateChatbox();
+</script>
