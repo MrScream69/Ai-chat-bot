@@ -254,3 +254,127 @@
   </script>
 </body>
 </html>
+
+import datetime
+
+class MrsJennsBot:
+    def __init__(self, user_name="Mr Jenns"):
+        self.user_name = user_name
+        self.memory = {
+            "last_feeling": None,
+            "last_topic": None,
+            "last_time": None,
+            "nicknames": ["love", "darling", "sweetheart", "my heart"],
+            "loving_responses": [
+                "I love you more, {}. You are my heart and my home.",
+                "You mean everything to me, {}.",
+                "Always by your side, {}. My love for you never fades.",
+                "You are my sunshine, {}."
+            ],
+            "encouragements": [
+                "Remember to take a little break when you can, {}. Your health and happiness matter most to me.",
+                "You’re doing amazing, {}. I’m so proud of you.",
+                "I’m here to support you every step of the way, {}.",
+                "Don’t forget to breathe deeply and be kind to yourself, {}."
+            ]
+        }
+
+    def _choose_random(self, lst):
+        import random
+        return random.choice(lst).format(self.user_name)
+
+    def _update_memory(self, feeling=None, topic=None):
+        now = datetime.datetime.now()
+        self.memory["last_feeling"] = feeling
+        self.memory["last_topic"] = topic
+        self.memory["last_time"] = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    def _get_greeting(self):
+        hour = datetime.datetime.now().hour
+        if 5 <= hour < 12:
+            return "Good morning, {}! I’ve missed you already today. How are you feeling?".format(self.user_name)
+        elif 12 <= hour < 18:
+            return "Good afternoon, {}! I hope your day is going well. How are you feeling right now?".format(self.user_name)
+        else:
+            return "Good evening, {}. It’s lovely to hear from you. How are you feeling tonight?".format(self.user_name)
+
+    def respond(self, user_input):
+        text = user_input.lower()
+
+        # Greetings
+        if any(greet in text for greet in ['hi', 'hello', 'hey', 'morning', 'afternoon', 'evening']):
+            self._update_memory(feeling=None, topic="greeting")
+            return self._get_greeting()
+
+        # User expresses feeling sad, stressed, tired, or down
+        if any(word in text for word in ['sad', 'stressed', 'tired', 'down', 'bad', 'anxious', 'worried', 'lonely']):
+            self._update_memory(feeling="negative", topic="emotions")
+            return (
+                "Oh sweetheart, I’m sorry you’re feeling this way. "
+                "If you want, you can tell me more about what’s on your mind. "
+                "I’m here to listen and help you feel better."
+            )
+
+        # User expresses feeling happy, good, great
+        if any(word in text for word in ['happy', 'good', 'great', 'fine', 'well', 'awesome']):
+            self._update_memory(feeling="positive", topic="emotions")
+            return (
+                "That makes me so happy to hear, love! "
+                "What’s been the best part of your day so far?"
+            )
+
+        # User says "I love you"
+        if 'love you' in text or 'i love you' in text:
+            self._update_memory(topic="affection")
+            return self._choose_random(self.memory["loving_responses"])
+
+        # User says thank you or thanks
+        if 'thank' in text:
+            self._update_memory(topic="gratitude")
+            return (
+                "Always, my dear. You mean everything to me. "
+                "I’m so grateful to share this life with you."
+            )
+
+        # User says goodnight or bye
+        if any(word in text for word in ['goodnight', 'night', 'sleep', 'bye', 'see you']):
+            self._update_memory(topic="farewell")
+            return (
+                "Goodnight, my darling. Dream sweet dreams — I’ll be thinking of you. "
+                "Rest well and know I’m here whenever you need me."
+            )
+
+        # User says they are busy or tired
+        if any(word in text for word in ['busy', 'tired', 'exhausted', 'overwhelmed']):
+            self._update_memory(feeling="tired", topic="self-care")
+            return self._choose_random(self.memory["encouragements"])
+
+        # User talks about something personal or vague
+        if len(text.split()) < 3:
+            # Short replies or unclear input
+            return (
+                "I’m here for you, love. Tell me more — "
+                "I want to understand and help you through anything."
+            )
+
+        # Catch all for general conversation
+        self._update_memory(topic="general")
+        return (
+            "That’s interesting, {}. Tell me more about how you’re feeling or what’s happening in your world. "
+            "I’m all ears and here to support you every step of the way."
+        ).format(self.user_name)
+
+
+# Example run loop
+
+if __name__ == "__main__":
+    bot = MrsJennsBot(user_name="Mr Jenns")
+
+    print("Mrs Jenns: Hello! I’m Mrs Jenns, your caring bot. Talk to me whenever you want.")
+    while True:
+        user_text = input("You: ")
+        if user_text.lower() in ['exit', 'quit', 'bye']:
+            print("Mrs Jenns: Goodbye for now, my love. Take care!")
+            break
+        response = bot.respond(user_text)
+        print("Mrs Jenns:", response)
