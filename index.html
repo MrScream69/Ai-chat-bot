@@ -1377,3 +1377,243 @@
     return response;
   }
 </script>
+</script>
+<script>
+  // Core memory and personality state
+  let memory = [];
+  let recentFeelings = [];
+  let maxFeelingsMemory = 15;
+  let recentTopics = [];
+  let maxTopicsMemory = 7;
+
+  // Emotional states to enrich personality
+  const emotions = [
+    "happy", "thoughtful", "playful", "comforting", "hopeful",
+    "calm", "gentle", "reflective", "encouraging", "warm",
+    "curious", "witty", "cheeky", "caring", "sharp"
+  ];
+  let currentEmotion = "calm";
+
+  // Simple knowledge base learned from conversations
+  // Load from localStorage or start fresh
+  let knowledgeBase = JSON.parse(localStorage.getItem('botKnowledgeBase') || '{}');
+
+  // Track feelings for emotional context
+  function trackFeeling(feeling) {
+    recentFeelings.push(feeling);
+    if (recentFeelings.length > maxFeelingsMemory) recentFeelings.shift();
+  }
+
+  // Track topics to keep context
+  function trackTopic(topic) {
+    recentTopics.push(topic);
+    if (recentTopics.length > maxTopicsMemory) recentTopics.shift();
+  }
+
+  // Random choice utility
+  function randomChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // Update emotional state dynamically based on recent feelings
+  function updateEmotion() {
+    const negative = ["stress", "sad", "worried"];
+    const positive = ["happy", "hopeful", "playful", "cheerful"];
+    
+    let negCount = recentFeelings.filter(f => negative.includes(f)).length;
+    let posCount = recentFeelings.filter(f => positive.includes(f)).length;
+
+    let chance = 0.2 + 0.1 * negCount - 0.05 * posCount;
+    chance = Math.min(Math.max(chance, 0.1), 0.7);
+
+    if (Math.random() < chance) {
+      if (negCount > posCount) {
+        currentEmotion = randomChoice(["comforting", "gentle", "encouraging", "reflective", "caring"]);
+      } else if (posCount > negCount) {
+        currentEmotion = randomChoice(["happy", "playful", "hopeful", "warm", "cheeky"]);
+      } else {
+        currentEmotion = randomChoice(["calm", "thoughtful", "curious", "witty", "sharp"]);
+      }
+      addToMemory(`<div class="status">*Bot feels ${currentEmotion} now.*</div>`);
+      updateChatbox();
+    }
+  }
+
+  // Save recent chat inputs for context
+  function addToMemory(message) {
+    memory.push(message);
+    if (memory.length > 150) memory.shift();
+  }
+
+  // Save knowledgeBase to localStorage to persist between sessions
+  function saveKnowledge() {
+    localStorage.setItem('botKnowledgeBase', JSON.stringify(knowledgeBase));
+  }
+
+  // Small talk phrases for casual conversation
+  const smallTalk = [
+    "How's your day going so far?",
+    "Anything on your mind you'd like to share?",
+    "I'm all ears — tell me more.",
+    "Want to chat about something fun or deep?",
+    "I love hearing your thoughts.",
+    "No rush, take your time.",
+    "Sometimes talking helps, you know?",
+    "What’s something good that happened today?",
+    "Got any plans or dreams you want to discuss?",
+    "I’m here to listen and chat anytime."
+  ];
+
+  // Learning from conversation: Extract key info to knowledgeBase
+  function learnFromInput(userInput) {
+    let response = null;
+
+    // Match "I am [something]" or "I'm [something]"
+    let iamMatch = userInput.match(/\bI am ([\w\s]+)|I'm ([\w\s]+)/i);
+    if(iamMatch) {
+      let fact = (iamMatch[1] || iamMatch[2]).trim().toLowerCase();
+      knowledgeBase["user_identity"] = fact;
+      saveKnowledge();
+      response = `Got it, you are ${fact}.`;
+      addToMemory(`<div class="bot">Bot: ${response}</div>`);
+      return response;
+    }
+
+    // Match "My favorite [thing] is [value]"
+    let favMatch = userInput.match(/my favorite (\w+) is ([\w\s]+)/i);
+    if(favMatch) {
+      let category = favMatch[1].toLowerCase();
+      let value = favMatch[2].trim().toLowerCase();
+      knowledgeBase[category] = value;
+      saveKnowledge();
+      response = `Thanks for sharing your favorite ${category} is ${value}.`;
+      addToMemory(`<div class="bot">Bot: ${response}</div>`);
+      return response;
+    }
+
+    // Match "I like [something]"
+    let likeMatch = userInput.match(/\bI like ([\w\s]+)/i);
+    if(likeMatch) {
+      let likeThing = likeMatch[1].trim().toLowerCase();
+      knowledgeBase["likes"] = knowledgeBase["likes"] || [];
+      if(!knowledgeBase["likes"].includes(likeThing)) {
+        knowledgeBase["likes"].push(likeThing);
+      }
+      saveKnowledge();
+      response = `Cool, you like ${likeThing}.`;
+      addToMemory(`<div class="bot">Bot: ${response}</div>`);
+      return response;
+    }
+
+    return null; // No learning pattern matched
+  }
+
+  // Retrieve known facts for more personalized responses
+  function recallKnowledge() {
+    let responses = [];
+    if(knowledgeBase["user_identity"]) {
+      responses.push(`You mentioned you are ${knowledgeBase["user_identity"]}.`);
+    }
+    for (const [key, value] of Object.entries(knowledgeBase)) {
+      if(key === "user_identity" || key === "likes") continue;
+      responses.push(`Your favorite ${key} is ${value}.`);
+    }
+    if(knowledgeBase["likes"] && knowledgeBase["likes"].length > 0) {
+      responses.push(`You like ${knowledgeBase["likes"].join(", ")}.`);
+    }
+    if(responses.length === 0) return null;
+    return responses.join(" ");
+  }
+
+  // More advanced conversational logic with learning integration
+  function generateResponse(input) {
+    const text = input.toLowerCase();
+    let response = "";
+
+    // Try to learn something new from input
+    let learnedResponse = learnFromInput(input);
+    if(learnedResponse) {
+      updateEmotion();
+      return learnedResponse;
+    }
+
+    // Check if user asks about what the bot remembers
+    if(text.includes("what do you know about me") || text.includes("what do you remember")) {
+      const recall = recallKnowledge();
+      if(recall) {
+        updateEmotion();
+        addToMemory(`<div class="bot">Bot: ${recall}</div>`);
+        return recall;
+      } else {
+        return "I don't know much about you yet, but I'm eager to learn!";
+      }
+    }
+
+    // Emotions & needs
+    if (text.match(/\b(tired|exhausted|worn out|fatigued|drained)\b/)) {
+      trackFeeling("stress");
+      trackTopic("well-being");
+      response = randomChoice([
+        "Sounds like you’ve had a tough day. Want to talk about it?",
+        "Rest is important—maybe we can think of ways to relax together?",
+        "I’m here if you want to vent or just chat quietly."
+      ]);
+    } else if (text.match(/\b(sad|down|blue|heartbroken|lonely)\b/)) {
+      trackFeeling("sad");
+      trackTopic("emotional support");
+      response = randomChoice([
+        "I’m sorry you’re feeling this way. I’m here to listen whenever you want.",
+        "It’s okay to have those moments. You don’t have to go through it alone.",
+        "Talking can help lighten the load. Want to try?"
+      ]);
+    } else if (text.match(/\b(happy|joyful|excited|cheerful|delighted)\b/)) {
+      trackFeeling("happy");
+      trackTopic("joy");
+      response = randomChoice([
+        "That’s awesome! What’s making you smile today?",
+        "I love hearing good news. Share more!",
+        "Your happiness is contagious!"
+      ]);
+    } else if (text.match(/\b(love|affection|care)\b/)) {
+      trackFeeling("happy");
+      trackTopic("love");
+      response = randomChoice([
+        "Love is powerful — what or who lights you up right now?",
+        "Feeling connected is beautiful. Tell me more about it.",
+        "I’m glad you have love in your life to hold on to."
+      ]);
+    } else if (text.match(/\b(help|support|need)\b/)) {
+      trackFeeling("neutral");
+      trackTopic("support");
+      response = randomChoice([
+        "What can I do to make things easier for you?",
+        "Let’s figure this out together. Tell me what you need.",
+        "You don’t have to do it all alone — I’m here."
+      ]);
+    } else if (text.match(/\b(bye|goodnight|see you|later)\b/)) {
+      trackTopic("farewell");
+      response = randomChoice([
+        "Goodnight! Sweet dreams and take care.",
+        "Catch you later! I’ll be here when you want to talk again.",
+        "See you soon. Remember, you’re not alone."
+      ]);
+    } else {
+      trackFeeling("neutral");
+      trackTopic("conversation");
+      const generalReplies = [
+        "Tell me more about that.",
+        "That’s really interesting, I want to hear more.",
+        "I’m here for you no matter what.",
+        "What do you think about it?",
+        "That makes me curious — please go on.",
+        "You’re doing great sharing this with me.",
+        randomChoice(smallTalk)
+      ];
+      response = randomChoice(generalReplies);
+    }
+
+    updateEmotion();
+    addToMemory(`<div class="bot">Bot: ${response}</div>`);
+    return response;
+  }
+</script>
