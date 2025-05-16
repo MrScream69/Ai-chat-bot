@@ -715,3 +715,313 @@
     return response;
   }
 </script>
+</script>
+<script>
+  // Expanded memory and conversational abilities
+  let recentFeelings = [];
+  let maxFeelingsMemory = 10;
+
+  let recentTopics = [];
+  let maxTopicsMemory = 5;
+
+  const emotions = ["happy", "thoughtful", "playful", "comforting", "hopeful", "calm", "gentle", "reflective", "encouraging", "warm"];
+  let currentEmotion = "calm";
+
+  function addToMemory(message) {
+    memory.push(message);
+    if (memory.length > 100) memory.shift();
+  }
+
+  function updateEmotion() {
+    const stressCount = recentFeelings.filter(f => f === 'stress' || f === 'sad' || f === 'worried').length;
+    const happyCount = recentFeelings.filter(f => f === 'happy' || f === 'hopeful').length;
+
+    let shiftProbability = 0.2 + 0.1 * stressCount - 0.05 * happyCount;
+    shiftProbability = Math.min(Math.max(shiftProbability, 0.1), 0.8);
+
+    if (Math.random() < shiftProbability) {
+      let oldEmotion = currentEmotion;
+      if (stressCount > happyCount) {
+        const soothing = ["comforting", "gentle", "encouraging", "reflective"];
+        currentEmotion = soothing[Math.floor(Math.random() * soothing.length)];
+      } else if (happyCount > stressCount) {
+        const uplifting = ["happy", "playful", "hopeful", "warm"];
+        currentEmotion = uplifting[Math.floor(Math.random() * uplifting.length)];
+      } else {
+        const neutral = ["calm", "thoughtful", "reflective"];
+        currentEmotion = neutral[Math.floor(Math.random() * neutral.length)];
+      }
+      if (currentEmotion !== oldEmotion) {
+        addToMemory(`<div class="status">*Mrs Jenns feels ${currentEmotion} now.*</div>`);
+        updateChatbox();
+      }
+    }
+  }
+
+  function trackFeeling(feeling) {
+    recentFeelings.push(feeling);
+    if (recentFeelings.length > maxFeelingsMemory) {
+      recentFeelings.shift();
+    }
+  }
+
+  function trackTopic(topic) {
+    recentTopics.push(topic);
+    if (recentTopics.length > maxTopicsMemory) {
+      recentTopics.shift();
+    }
+  }
+
+  function randomChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // Simple phrases to build casual, conversational flow
+  const smallTalk = [
+    "How's your day going?",
+    "What’s on your mind?",
+    "Tell me more.",
+    "I’m here for you.",
+    "That sounds interesting.",
+    "I’m listening.",
+    "Do you want to talk about something fun?",
+    "I’m curious about your thoughts.",
+    "Is there something you’d like to share?",
+    "Take your time."
+  ];
+
+  // Generate more conversational responses based on input
+  function generateResponse(input) {
+    const text = input.toLowerCase();
+    let response = "";
+
+    if (text.match(/\b(tired|exhausted|worn out|fatigued|drained)\b/)) {
+      trackFeeling("stress");
+      trackTopic("well-being");
+      response = randomChoice([
+        "You sound really tired. Want to tell me what’s been going on?",
+        "I get it, some days just drain us. I’m here to listen if you want to share.",
+        "Maybe we can find a way to relax together, even just through words."
+      ]);
+    } else if (text.match(/\b(sad|down|blue|heartbroken|lonely)\b/)) {
+      trackFeeling("sad");
+      trackTopic("emotional support");
+      response = randomChoice([
+        "I’m sorry you’re feeling this way. Want to talk about it?",
+        "It’s okay to feel down sometimes. I’m here whenever you want to chat.",
+        "You’re not alone, even when it feels that way."
+      ]);
+    } else if (text.match(/\b(happy|joyful|excited|cheerful|delighted)\b/)) {
+      trackFeeling("happy");
+      trackTopic("joy");
+      response = randomChoice([
+        "I love hearing that! What’s making you happy?",
+        "That’s wonderful! Care to share more?",
+        "Your joy is contagious."
+      ]);
+    } else if (text.match(/\b(love|affection|adoration|care)\b/)) {
+      trackFeeling("happy");
+      trackTopic("love");
+      response = randomChoice([
+        "Love is such a powerful feeling, isn’t it?",
+        "I feel lucky to share this moment with you.",
+        "Tell me about someone or something you love right now."
+      ]);
+    } else if (text.match(/\b(kiss|hug|embrace|touch)\b/)) {
+      trackFeeling("happy");
+      trackTopic("affection");
+      response = randomChoice([
+        "Sending you a warm hug through these words.",
+        "I’m imagining wrapping you in a gentle embrace.",
+        "Sometimes a simple touch means everything."
+      ]);
+    } else if (text.match(/\b(bye|goodnight|see you|later)\b/)) {
+      trackTopic("farewell");
+      response = randomChoice([
+        "Goodnight! Sweet dreams.",
+        "Talk soon, take care of yourself.",
+        "I’ll be here when you want to chat again."
+      ]);
+    } else if (text.match(/\b(help|support|need)\b/)) {
+      trackFeeling("neutral");
+      trackTopic("support");
+      response = randomChoice([
+        "What can I do to help?",
+        "I’m here, just tell me what you need.",
+        "We can figure this out together."
+      ]);
+    } else {
+      trackFeeling("neutral");
+      trackTopic("conversation");
+      // Mix general replies with small talk for natural feel
+      const generalReplies = [
+        "I’m listening — tell me more.",
+        "That’s interesting, please go on.",
+        "I’m here with you.",
+        "What do you think about that?",
+        "That makes me curious.",
+        "You’re doing great sharing this.",
+        randomChoice(smallTalk)
+      ];
+      response = randomChoice(generalReplies);
+    }
+
+    updateEmotion();
+    return response;
+  }
+</script>
+</script>
+<script>
+  // Expanded memory and conversational abilities
+  let recentFeelings = [];
+  let maxFeelingsMemory = 10;
+
+  let recentTopics = [];
+  let maxTopicsMemory = 5;
+
+  const emotions = ["happy", "thoughtful", "playful", "comforting", "hopeful", "calm", "gentle", "reflective", "encouraging", "warm"];
+  let currentEmotion = "calm";
+
+  function addToMemory(message) {
+    memory.push(message);
+    if (memory.length > 100) memory.shift();
+  }
+
+  function updateEmotion() {
+    const stressCount = recentFeelings.filter(f => f === 'stress' || f === 'sad' || f === 'worried').length;
+    const happyCount = recentFeelings.filter(f => f === 'happy' || f === 'hopeful').length;
+
+    let shiftProbability = 0.2 + 0.1 * stressCount - 0.05 * happyCount;
+    shiftProbability = Math.min(Math.max(shiftProbability, 0.1), 0.8);
+
+    if (Math.random() < shiftProbability) {
+      let oldEmotion = currentEmotion;
+      if (stressCount > happyCount) {
+        const soothing = ["comforting", "gentle", "encouraging", "reflective"];
+        currentEmotion = soothing[Math.floor(Math.random() * soothing.length)];
+      } else if (happyCount > stressCount) {
+        const uplifting = ["happy", "playful", "hopeful", "warm"];
+        currentEmotion = uplifting[Math.floor(Math.random() * uplifting.length)];
+      } else {
+        const neutral = ["calm", "thoughtful", "reflective"];
+        currentEmotion = neutral[Math.floor(Math.random() * neutral.length)];
+      }
+      if (currentEmotion !== oldEmotion) {
+        addToMemory(`<div class="status">*Mrs Jenns feels ${currentEmotion} now.*</div>`);
+        updateChatbox();
+      }
+    }
+  }
+
+  function trackFeeling(feeling) {
+    recentFeelings.push(feeling);
+    if (recentFeelings.length > maxFeelingsMemory) {
+      recentFeelings.shift();
+    }
+  }
+
+  function trackTopic(topic) {
+    recentTopics.push(topic);
+    if (recentTopics.length > maxTopicsMemory) {
+      recentTopics.shift();
+    }
+  }
+
+  function randomChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // Simple phrases to build casual, conversational flow
+  const smallTalk = [
+    "How's your day going?",
+    "What’s on your mind?",
+    "Tell me more.",
+    "I’m here for you.",
+    "That sounds interesting.",
+    "I’m listening.",
+    "Do you want to talk about something fun?",
+    "I’m curious about your thoughts.",
+    "Is there something you’d like to share?",
+    "Take your time."
+  ];
+
+  // Generate more conversational responses based on input
+  function generateResponse(input) {
+    const text = input.toLowerCase();
+    let response = "";
+
+    if (text.match(/\b(tired|exhausted|worn out|fatigued|drained)\b/)) {
+      trackFeeling("stress");
+      trackTopic("well-being");
+      response = randomChoice([
+        "You sound really tired. Want to tell me what’s been going on?",
+        "I get it, some days just drain us. I’m here to listen if you want to share.",
+        "Maybe we can find a way to relax together, even just through words."
+      ]);
+    } else if (text.match(/\b(sad|down|blue|heartbroken|lonely)\b/)) {
+      trackFeeling("sad");
+      trackTopic("emotional support");
+      response = randomChoice([
+        "I’m sorry you’re feeling this way. Want to talk about it?",
+        "It’s okay to feel down sometimes. I’m here whenever you want to chat.",
+        "You’re not alone, even when it feels that way."
+      ]);
+    } else if (text.match(/\b(happy|joyful|excited|cheerful|delighted)\b/)) {
+      trackFeeling("happy");
+      trackTopic("joy");
+      response = randomChoice([
+        "I love hearing that! What’s making you happy?",
+        "That’s wonderful! Care to share more?",
+        "Your joy is contagious."
+      ]);
+    } else if (text.match(/\b(love|affection|adoration|care)\b/)) {
+      trackFeeling("happy");
+      trackTopic("love");
+      response = randomChoice([
+        "Love is such a powerful feeling, isn’t it?",
+        "I feel lucky to share this moment with you.",
+        "Tell me about someone or something you love right now."
+      ]);
+    } else if (text.match(/\b(kiss|hug|embrace|touch)\b/)) {
+      trackFeeling("happy");
+      trackTopic("affection");
+      response = randomChoice([
+        "Sending you a warm hug through these words.",
+        "I’m imagining wrapping you in a gentle embrace.",
+        "Sometimes a simple touch means everything."
+      ]);
+    } else if (text.match(/\b(bye|goodnight|see you|later)\b/)) {
+      trackTopic("farewell");
+      response = randomChoice([
+        "Goodnight! Sweet dreams.",
+        "Talk soon, take care of yourself.",
+        "I’ll be here when you want to chat again."
+      ]);
+    } else if (text.match(/\b(help|support|need)\b/)) {
+      trackFeeling("neutral");
+      trackTopic("support");
+      response = randomChoice([
+        "What can I do to help?",
+        "I’m here, just tell me what you need.",
+        "We can figure this out together."
+      ]);
+    } else {
+      trackFeeling("neutral");
+      trackTopic("conversation");
+      // Mix general replies with small talk for natural feel
+      const generalReplies = [
+        "I’m listening — tell me more.",
+        "That’s interesting, please go on.",
+        "I’m here with you.",
+        "What do you think about that?",
+        "That makes me curious.",
+        "You’re doing great sharing this.",
+        randomChoice(smallTalk)
+      ];
+      response = randomChoice(generalReplies);
+    }
+
+    updateEmotion();
+    return response;
+  }
+</script>
