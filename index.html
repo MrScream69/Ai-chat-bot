@@ -1,136 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>I love Mrs Jenns</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Montserrat:wght@300&display=swap');
-
-    body {
-      margin: 0;
-      padding: 20px;
-      background: linear-gradient(135deg, #1a001a 0%, #330033 100%);
-      color: #e6d7f5;
-      font-family: 'Montserrat', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    h1 {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 3rem;
-      margin-bottom: 15px;
-      color: #e3baff;
-      text-shadow:
-        0 0 5px #bb33ff,
-        0 0 15px #bb33ff,
-        0 0 20px #d366ff;
-      user-select: none;
-    }
-
-    #portrait {
-      width: 220px;
-      height: 320px;
-      background: url('https://i.ibb.co/0GzG9bn/gothic-girl.png') no-repeat center/cover;
-      border: 4px solid #bb33ff;
-      border-radius: 20px;
-      box-shadow:
-        0 0 10px #bb33ff,
-        0 0 25px #d366ff,
-        inset 0 0 15px #660066;
-      margin-bottom: 25px;
-      filter: drop-shadow(0 0 8px #aa22ff);
-    }
-
-    #chatbox {
-      width: 90%;
-      max-width: 650px;
-      height: 350px;
-      background: rgba(50, 0, 50, 0.85);
-      border-radius: 15px;
-      padding: 20px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      box-shadow:
-        inset 0 0 15px #bb33ff,
-        0 0 30px #aa22ff;
-      font-size: 1.1rem;
-      line-height: 1.5;
-      margin-bottom: 20px;
-      color: #f0e7ff;
-      font-weight: 300;
-      font-style: italic;
-    }
-
-    textarea {
-      width: 90%;
-      max-width: 650px;
-      height: 90px;
-      border-radius: 12px;
-      border: none;
-      padding: 15px;
-      font-size: 1.2rem;
-      resize: none;
-      background-color: #2b002b;
-      color: #e6d7f5;
-      box-shadow:
-        0 0 15px #bb33ff;
-      font-family: 'Montserrat', sans-serif;
-    }
-
-    textarea::placeholder {
-      color: #c9a3ff;
-      font-style: italic;
-    }
-
-    button {
-      width: 90%;
-      max-width: 650px;
-      padding: 18px;
-      margin-top: 15px;
-      font-size: 1.3rem;
-      border: none;
-      border-radius: 14px;
-      background-color: #bb33ff;
-      color: #fff;
-      cursor: pointer;
-      font-weight: 600;
-      box-shadow:
-        0 0 15px #d366ff;
-      transition: background-color 0.3s ease;
-      font-family: 'Montserrat', sans-serif;
-      user-select: none;
-    }
-
-    button:hover {
-      background-color: #d366ff;
-      box-shadow:
-        0 0 25px #eeaaff;
-    }
-
-    /* Scrollbar styling */
-    #chatbox::-webkit-scrollbar {
-      width: 10px;
-    }
-
-    #chatbox::-webkit-scrollbar-track {
-      background: #330033;
-      border-radius: 15px;
-    }
-
-    #chatbox::-webkit-scrollbar-thumb {
-      background: #bb33ff;
-      border-radius: 15px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🖤I love Mrs Jenns🤍</title>
+<style>
+  body {
+    background: #1a001a;
+    color: #e6d7f5;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  h1 {
+    color: #bb33ff;
+    text-align: center;
+  }
+  #chatbox {
+    background: #330033;
+    height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    margin-bottom: 10px;
+  }
+  textarea {
+    width: 100%;
+    height: 80px;
+    border-radius: 8px;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    resize: none;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #bb33ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
   <h1>I love Mrs Jenns</h1>
-  <div id="portrait"></div>
   <div id="chatbox">You can begin your roleplay below:</div>
   <textarea id="userInput" placeholder="Type your message..."></textarea>
   <button onclick="sendMessage()">Send</button>
@@ -156,14 +72,9 @@
 
     function generateResponse(input) {
       input = input.toLowerCase();
-
-      if (input.includes("dragon")) return "The dragon roars in the sky, its wings blotting out the sun.";
-      if (input.includes("hello")) return "Hello, traveler. What tale shall we create today?";
-      if (input.includes("child") || input.includes("kid")) return "The little one looks up at you with big eyes and a mischievous grin.";
-      if (input.includes("kiss")) return "Their lips met yours — gentle, hesitant, then hungry.";
-      if (input.includes("run")) return "You take off through the misty forest, boots thudding against wet soil.";
-
-      return "The wind whispers as the world waits for your next move...";
+      if (input.includes("hello")) return "Hello, traveler!";
+      if (input.includes("bye")) return "Farewell for now.";
+      return "The shadows whisper, but I cannot answer that yet.";
     }
   </script>
 </body>
