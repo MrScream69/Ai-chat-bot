@@ -32,6 +32,8 @@
       white-space: pre-wrap;
       font-size: 1.1rem;
       box-shadow: inset 0 0 10px #a03fff;
+      margin-bottom: 10px;
+      line-height: 1.4;
     }
     textarea {
       width: 100%;
@@ -40,9 +42,10 @@
       border-radius: 5px;
       border: none;
       resize: none;
-      margin-top: 15px;
+      margin-top: 5px;
       background: #222;
       color: #ddd;
+      font-family: 'Georgia', serif;
     }
     button {
       background: #a03fff;
@@ -54,6 +57,7 @@
       cursor: pointer;
       border-radius: 5px;
       transition: background 0.3s ease;
+      font-family: 'Georgia', serif;
     }
     button:hover {
       background: #bf00ff;
@@ -61,10 +65,18 @@
     .user {
       color: #7fffd4;
       font-weight: bold;
+      margin-bottom: 6px;
     }
     .bot {
       color: #bf00ff;
       font-style: italic;
+      margin-bottom: 6px;
+    }
+    .status {
+      color: #aaa;
+      font-style: italic;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
     }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet" />
@@ -77,306 +89,168 @@
 
   <script>
     const memory = [];
-
-    const responses = [
-      "The shadows dance around us as the night whispers secrets.",
-      "Your words echo softly in this haunted place.",
-      "A chill runs down your spine — the story deepens.",
-      "The moonlight reveals hidden truths in the darkness.",
-      "Your voice trembles, but you press onward.",
-      "Mysteries unravel as your tale unfolds.",
-      "A soft sigh in the silence answers your call.",
-      "The darkness listens, waiting for your next move.",
-      "An eerie calm settles; the game has only begun.",
-      "The spirits watch, intrigued by your courage."
-    ];
-
-    function randomResponse() {
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
+    const emotions = ["happy", "curious", "angry", "sad", "playful", "thoughtful"];
+    let currentEmotion = "curious";
+    let lastTopic = null;
 
     function sendMessage() {
-      const inputElem = document.getElementById('userInput');
+      const inputElem = document.getElementById("userInput");
       const input = inputElem.value.trim();
       if (!input) return;
-      memory.push({ speaker: 'user', text: input });
-      inputElem.value = '';
-      
-      // Generate bot reply with some keyword triggers for more flavor:
-      let reply = '';
-      const lower = input.toLowerCase();
+      inputElem.value = "";
 
-      if (lower.includes('hello') || lower.includes('hi')) {
-        reply = "Hello, traveler. The night is young and full of tales.";
-      } else if (lower.includes('love')) {
-        reply = "Love is the strongest magic, binding us through darkness.";
-      } else if (lower.includes('ghost') || lower.includes('spirit')) {
-        reply = "The spirits linger nearby, whispering forgotten secrets.";
-      } else if (lower.includes('run') || lower.includes('escape')) {
-        reply = "You feel the urgency, footsteps pounding in the dark.";
-      } else if (lower.includes('dark') || lower.includes('night')) {
-        reply = "Darkness enfolds you like a velvet cloak, mysterious and deep.";
-      } else if (lower.includes('help') || lower.includes('guide')) {
-        reply = "I am here to guide you through these shadowed paths.";
-      } else {
-        reply = randomResponse();
-      }
+      addToMemory(`<div class="user">You: ${escapeHTML(input)}</div>`);
+      simulateTyping(() => {
+        const botReply = generateResponse(input);
+        addToMemory(`<div class="bot">Bot (${currentEmotion}): ${escapeHTML(botReply)}</div>`);
+        updateChatbox();
+        updateEmotion();
+      });
+    }
 
-      memory.push({ speaker: 'bot', text: reply });
+    function addToMemory(htmlText) {
+      memory.push(htmlText);
+      if (memory.length > 50) memory.shift(); // keep memory size manageable
+    }
 
-      // Build chat text with styling
-      const chatbox = document.getElementById('chatbox');
-      chatbox.innerHTML = memory.map(m => {
-        if (m.speaker === 'user') return `<div class="user">You: ${m.text}</div>`;
-        else return `<div class="bot">Bot: ${m.text}</div>`;
-      }).join('');
+    function updateChatbox() {
+      const chatbox = document.getElementById("chatbox");
+      chatbox.innerHTML = memory.join("");
       chatbox.scrollTop = chatbox.scrollHeight;
     }
-  </script> let memory = [];
 
-const emotions = ["happy", "curious", "angry", "sad", "playful"];
-let currentEmotion = "curious";
-
-function sendMessage() {
-  const inputElem = document.getElementById("userInput");
-  const input = inputElem.value.trim();
-  if (!input) return;
-  inputElem.value = "";
-  
-  memory.push("You: " + input);
-  
-  const botReply = generateResponse(input);
-  memory.push("Bot (" + currentEmotion + "): " + botReply);
-  
-  updateChatbox();
-  updateEmotion();
-}
-
-function updateChatbox() {
-  const chatbox = document.getElementById("chatbox");
-  chatbox.innerText = memory.join("\n");
-  chatbox.scrollTop = chatbox.scrollHeight;
-}
-
-function updateEmotion() {
-  // Simple random emotion change with weighted chance
-  if (Math.random() < 0.3) {
-    const prevEmotion = currentEmotion;
-    currentEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-    if (currentEmotion !== prevEmotion) {
-      memory.push("Bot feels " + currentEmotion + " now.");
-      updateChatbox();
+    function updateEmotion() {
+      if (Math.random() < 0.3) {
+        const oldEmotion = currentEmotion;
+        currentEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+        if (currentEmotion !== oldEmotion) {
+          addToMemory(`<div class="status">*Bot feels ${currentEmotion} now.*</div>`);
+          updateChatbox();
+        }
+      }
     }
-  }
-}
 
-function generateResponse(input) {
-  input = input.toLowerCase();
+    function simulateTyping(callback) {
+      addToMemory(`<div class="status">*Bot is typing...*</div>`);
+      updateChatbox();
+      setTimeout(() => {
+        // Remove last typing line
+        if (memory[memory.length - 1].includes("*Bot is typing...*")) {
+          memory.pop();
+          updateChatbox();
+        }
+        callback();
+      }, 800 + Math.random() * 1200);
+    }
 
-  // Basic keyword responses with some variety
-  if (input.includes("hello") || input.includes("hi")) {
-    return randomChoice([
-      "Hello, traveler. What story shall we weave today?",
-      "Hey there! Ready for another adventure?",
-      "Greetings. What’s on your mind?"
-    ]);
-  }
-  if (input.includes("dragon")) {
-    return randomChoice([
-      "The dragon’s roar shakes the mountains!",
-      "You see the dragon circling above, wings casting shadows.",
-      "A fiery breath lights up the sky. The dragon is near."
-    ]);
-  }
-  if (input.includes("kiss")) {
-    return randomChoice([
-      "Their lips meet yours, soft and electric.",
-      "A shy smile, then a quick, sweet kiss.",
-      "The moment lingers, filled with silent promises."
-    ]);
-  }
-  if (input.includes("run")) {
-    return randomChoice([
-      "You dash through the misty forest, heart pounding.",
-      "Boots pounding, you escape into the shadows.",
-      "Your breath quickens as you run faster and faster."
-    ]);
-  }
-  if (input.includes("child") || input.includes("kid")) {
-    return randomChoice([
-      "The child’s eyes sparkle with curiosity and mischief.",
-      "You watch the little one play under the moonlight.",
-      "A small hand reaches out, trusting and innocent."
-    ]);
-  }
+    function generateResponse(input) {
+      input = input.toLowerCase();
 
-  // If no keywords matched, respond more dynamically
-  return randomChoice([
-    "The world waits for your next move...",
-    "I’m listening, tell me more.",
-    "The silence is thick; what happens next?",
-    "Your story unfolds with every word you speak."
-  ]);
-}
+      if (input.includes("hello") || input.includes("hi")) {
+        lastTopic = "greeting";
+        return randomChoice([
+          "Hello there! What are you up to today?",
+          "Hey! Ready to dive into some stories?",
+          "Hi! Got something on your mind?"
+        ]);
+      }
 
-function randomChoice(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
+      if (input.includes("dragon")) {
+        lastTopic = "dragon";
+        return randomChoice([
+          "The dragon’s fiery breath lights the night sky.",
+          "You hear a low growl, the dragon is near...",
+          "Dragons are fierce and mysterious creatures, aren't they?"
+        ]);
+      }
+
+      if (input.includes("kiss")) {
+        lastTopic = "kiss";
+        return randomChoice([
+          "A tender kiss lingers in the air, full of promise.",
+          "Their lips meet yours softly, time seems to stop.",
+          "A shy smile follows the sweet kiss."
+        ]);
+      }
+
+      if (input.includes("run")) {
+        lastTopic = "run";
+        return randomChoice([
+          "You sprint through the dark forest, heart racing.",
+          "The mist swirls as you flee, danger close behind.",
+          "Run fast, don’t look back!"
+        ]);
+      }
+
+      if (input.includes("child") || input.includes("kid")) {
+        lastTopic = "child";
+        return randomChoice([
+          "The child’s eyes are wide with wonder and mischief.",
+          "You feel protective watching the little one play.",
+          "Children bring light even to the darkest places."
+        ]);
+      }
+
+      if (lastTopic) {
+        if (lastTopic === "dragon") {
+          return randomChoice([
+            "That dragon has been haunting these lands for ages.",
+            "Do you think you could tame such a beast?",
+            "The dragon’s scales shimmer like a thousand stars."
+          ]);
+        }
+        if (lastTopic === "greeting") {
+          return randomChoice([
+            "So, what stories shall we explore together?",
+            "Tell me more about yourself!",
+            "I’m all ears—what’s your tale?"
+          ]);
+        }
+        if (lastTopic === "kiss") {
+          return randomChoice([
+            "Such moments make the heart flutter.",
+            "Romance in a dark world is rare and precious.",
+            "Do you believe in love’s magic?"
+          ]);
+        }
+        if (lastTopic === "run") {
+          return randomChoice([
+            "Every step could be your last—stay sharp.",
+            "The forest hides many secrets.",
+            "Where are you running from, if I may ask?"
+          ]);
+        }
+        if (lastTopic === "child") {
+          return randomChoice([
+            "Innocence is a treasure worth protecting.",
+            "What do you think the child dreams of at night?",
+            "Children see the world in ways adults forget."
+          ]);
+        }
+      }
+
+      return randomChoice([
+        "The wind whispers, waiting for your next words...",
+        "I’m here, listening closely.",
+        "Your story is just beginning, tell me more.",
+        "Mysteries abound, and so does the night.",
+        "What happens next is up to you..."
+      ]);
+    }
+
+    function randomChoice(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function escapeHTML(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    // Initialize with a welcome message
+    addToMemory('<div class="bot">Bot (curious): You can start chatting with me below...</div>');
+    updateChatbox();
+  </script>
 </body>
 </html>
-let memory = [];
-const emotions = ["happy", "curious", "angry", "sad", "playful", "thoughtful"];
-let currentEmotion = "curious";
-let lastTopic = null;
-
-function sendMessage() {
-  const inputElem = document.getElementById("userInput");
-  const input = inputElem.value.trim();
-  if (!input) return;
-  inputElem.value = "";
-
-  addToMemory("You: " + input);
-  simulateTyping(() => {
-    const botReply = generateResponse(input);
-    addToMemory(`Bot (${currentEmotion}): ${botReply}`);
-    updateChatbox();
-    updateEmotion();
-  });
-}
-
-function addToMemory(text) {
-  memory.push(text);
-  if (memory.length > 50) memory.shift(); // keep memory short-ish
-}
-
-function updateChatbox() {
-  const chatbox = document.getElementById("chatbox");
-  chatbox.innerText = memory.join("\n");
-  chatbox.scrollTop = chatbox.scrollHeight;
-}
-
-function updateEmotion() {
-  // Randomly change mood with 30% chance
-  if (Math.random() < 0.3) {
-    const oldEmotion = currentEmotion;
-    currentEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-    if (currentEmotion !== oldEmotion) {
-      addToMemory(`*Bot feels ${currentEmotion} now.*`);
-      updateChatbox();
-    }
-  }
-}
-
-function simulateTyping(callback) {
-  const typingDelay = 500 + Math.random() * 1500;
-  addToMemory("*Bot is typing...*");
-  updateChatbox();
-  setTimeout(() => {
-    // Remove "Bot is typing..." line before callback
-    memory = memory.filter(line => !line.includes("typing"));
-    updateChatbox();
-    callback();
-  }, typingDelay);
-}
-
-function generateResponse(input) {
-  input = input.toLowerCase();
-
-  // Basic topics and emotional variation
-  if (input.includes("hello") || input.includes("hi")) {
-    lastTopic = "greeting";
-    return randomChoice([
-      "Hello there! What are you up to today?",
-      "Hey! Ready to dive into some stories?",
-      "Hi! Got something on your mind?"
-    ]);
-  }
-
-  if (input.includes("dragon")) {
-    lastTopic = "dragon";
-    return randomChoice([
-      "The dragon’s fiery breath lights the night sky.",
-      "You hear a low growl, the dragon is near...",
-      "Dragons are fierce and mysterious creatures, aren't they?"
-    ]);
-  }
-
-  if (input.includes("kiss")) {
-    lastTopic = "kiss";
-    return randomChoice([
-      "A tender kiss lingers in the air, full of promise.",
-      "Their lips meet yours softly, time seems to stop.",
-      "A shy smile follows the sweet kiss."
-    ]);
-  }
-
-  if (input.includes("run")) {
-    lastTopic = "run";
-    return randomChoice([
-      "You sprint through the dark forest, heart racing.",
-      "The mist swirls as you flee, danger close behind.",
-      "Run fast, don’t look back!"
-    ]);
-  }
-
-  if (input.includes("child") || input.includes("kid")) {
-    lastTopic = "child";
-    return randomChoice([
-      "The child’s eyes are wide with wonder and mischief.",
-      "You feel protective watching the little one play.",
-      "Children bring light even to the darkest places."
-    ]);
-  }
-
-  // Use last topic to keep context flowing
-  if (lastTopic) {
-    if (lastTopic === "dragon") {
-      return randomChoice([
-        "That dragon has been haunting these lands for ages.",
-        "Do you think you could tame such a beast?",
-        "The dragon’s scales shimmer like a thousand stars."
-      ]);
-    }
-    if (lastTopic === "greeting") {
-      return randomChoice([
-        "So, what stories shall we explore together?",
-        "Tell me more about yourself!",
-        "I’m all ears—what’s your tale?"
-      ]);
-    }
-    if (lastTopic === "kiss") {
-      return randomChoice([
-        "Such moments make the heart flutter.",
-        "Romance in a dark world is rare and precious.",
-        "Do you believe in love’s magic?"
-      ]);
-    }
-    if (lastTopic === "run") {
-      return randomChoice([
-        "Every step could be your last—stay sharp.",
-        "The forest hides many secrets.",
-        "Where are you running from, if I may ask?"
-      ]);
-    }
-    if (lastTopic === "child") {
-      return randomChoice([
-        "Innocence is a treasure worth protecting.",
-        "What do you think the child dreams of at night?",
-        "Children see the world in ways adults forget."
-      ]);
-    }
-  }
-
-  // Default fallback responses with some variation
-  return randomChoice([
-    "The wind whispers, waiting for your next words...",
-    "I’m here, listening closely.",
-    "Your story is just beginning, tell me more.",
-    "Mysteries abound, and so does the night.",
-    "What happens next is up to you..."
-  ]);
-}
-
-function randomChoice(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
