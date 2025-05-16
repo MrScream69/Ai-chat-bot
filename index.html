@@ -5,73 +5,126 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>I love Mrs Jenns</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Montserrat:wght@300&display=swap');
+
     body {
-      background-color: #121212;
-      color: #eee;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0; padding: 20px;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #1a001a 0%, #330033 100%);
+      color: #e6d7f5;
+      font-family: 'Montserrat', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       height: 100vh;
+      overflow: hidden;
     }
+
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-      color: #f4f4f4;
-      text-shadow: 0 0 10px #a300a3;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: #e3baff;
+      text-shadow:
+        0 0 5px #bb33ff,
+        0 0 15px #bb33ff,
+        0 0 20px #d366ff;
+      user-select: none;
     }
+
     #portrait {
-      width: 200px;
-      height: 300px;
+      width: 220px;
+      height: 320px;
       background: url('https://i.ibb.co/0GzG9bn/gothic-girl.png') no-repeat center/cover;
-      border: 3px solid #a300a3;
-      border-radius: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 15px #a300a3;
+      border: 4px solid #bb33ff;
+      border-radius: 20px;
+      box-shadow:
+        0 0 10px #bb33ff,
+        0 0 25px #d366ff,
+        inset 0 0 15px #660066;
+      margin-bottom: 25px;
+      filter: drop-shadow(0 0 8px #aa22ff);
     }
+
     #chatbox {
       width: 90%;
-      max-width: 600px;
+      max-width: 650px;
       height: 350px;
-      background-color: #222;
-      border-radius: 10px;
-      padding: 15px;
+      background: rgba(50, 0, 50, 0.85);
+      border-radius: 15px;
+      padding: 20px;
       overflow-y: auto;
       white-space: pre-wrap;
-      box-shadow: inset 0 0 15px #550055;
+      box-shadow:
+        inset 0 0 15px #bb33ff,
+        0 0 30px #aa22ff;
       font-size: 1.1rem;
-      margin-bottom: 15px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      color: #f0e7ff;
+      font-weight: 300;
+      font-style: italic;
     }
+
     textarea {
       width: 90%;
-      max-width: 600px;
-      height: 80px;
-      border-radius: 8px;
+      max-width: 650px;
+      height: 90px;
+      border-radius: 12px;
       border: none;
-      padding: 10px;
-      font-size: 1.1rem;
+      padding: 15px;
+      font-size: 1.2rem;
       resize: none;
-      box-shadow: 0 0 10px #a300a3;
-      background-color: #1e1e1e;
-      color: #eee;
+      background-color: #2b002b;
+      color: #e6d7f5;
+      box-shadow:
+        0 0 15px #bb33ff;
+      font-family: 'Montserrat', sans-serif;
     }
+
+    textarea::placeholder {
+      color: #c9a3ff;
+      font-style: italic;
+    }
+
     button {
       width: 90%;
-      max-width: 600px;
-      padding: 15px;
-      margin-top: 10px;
-      font-size: 1.2rem;
+      max-width: 650px;
+      padding: 18px;
+      margin-top: 15px;
+      font-size: 1.3rem;
       border: none;
-      border-radius: 10px;
-      background-color: #a300a3;
-      color: white;
+      border-radius: 14px;
+      background-color: #bb33ff;
+      color: #fff;
       cursor: pointer;
-      box-shadow: 0 0 15px #a300a3;
+      font-weight: 600;
+      box-shadow:
+        0 0 15px #d366ff;
       transition: background-color 0.3s ease;
+      font-family: 'Montserrat', sans-serif;
+      user-select: none;
     }
+
     button:hover {
-      background-color: #d400d4;
+      background-color: #d366ff;
+      box-shadow:
+        0 0 25px #eeaaff;
+    }
+
+    /* Scrollbar styling */
+    #chatbox::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    #chatbox::-webkit-scrollbar-track {
+      background: #330033;
+      border-radius: 15px;
+    }
+
+    #chatbox::-webkit-scrollbar-thumb {
+      background: #bb33ff;
+      border-radius: 15px;
     }
   </style>
 </head>
