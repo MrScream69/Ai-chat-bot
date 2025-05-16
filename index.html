@@ -132,6 +132,95 @@
       }).join('');
       chatbox.scrollTop = chatbox.scrollHeight;
     }
-  </script>
+  </script> let memory = [];
+
+const emotions = ["happy", "curious", "angry", "sad", "playful"];
+let currentEmotion = "curious";
+
+function sendMessage() {
+  const inputElem = document.getElementById("userInput");
+  const input = inputElem.value.trim();
+  if (!input) return;
+  inputElem.value = "";
+  
+  memory.push("You: " + input);
+  
+  const botReply = generateResponse(input);
+  memory.push("Bot (" + currentEmotion + "): " + botReply);
+  
+  updateChatbox();
+  updateEmotion();
+}
+
+function updateChatbox() {
+  const chatbox = document.getElementById("chatbox");
+  chatbox.innerText = memory.join("\n");
+  chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+function updateEmotion() {
+  // Simple random emotion change with weighted chance
+  if (Math.random() < 0.3) {
+    const prevEmotion = currentEmotion;
+    currentEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+    if (currentEmotion !== prevEmotion) {
+      memory.push("Bot feels " + currentEmotion + " now.");
+      updateChatbox();
+    }
+  }
+}
+
+function generateResponse(input) {
+  input = input.toLowerCase();
+
+  // Basic keyword responses with some variety
+  if (input.includes("hello") || input.includes("hi")) {
+    return randomChoice([
+      "Hello, traveler. What story shall we weave today?",
+      "Hey there! Ready for another adventure?",
+      "Greetings. What’s on your mind?"
+    ]);
+  }
+  if (input.includes("dragon")) {
+    return randomChoice([
+      "The dragon’s roar shakes the mountains!",
+      "You see the dragon circling above, wings casting shadows.",
+      "A fiery breath lights up the sky. The dragon is near."
+    ]);
+  }
+  if (input.includes("kiss")) {
+    return randomChoice([
+      "Their lips meet yours, soft and electric.",
+      "A shy smile, then a quick, sweet kiss.",
+      "The moment lingers, filled with silent promises."
+    ]);
+  }
+  if (input.includes("run")) {
+    return randomChoice([
+      "You dash through the misty forest, heart pounding.",
+      "Boots pounding, you escape into the shadows.",
+      "Your breath quickens as you run faster and faster."
+    ]);
+  }
+  if (input.includes("child") || input.includes("kid")) {
+    return randomChoice([
+      "The child’s eyes sparkle with curiosity and mischief.",
+      "You watch the little one play under the moonlight.",
+      "A small hand reaches out, trusting and innocent."
+    ]);
+  }
+
+  // If no keywords matched, respond more dynamically
+  return randomChoice([
+    "The world waits for your next move...",
+    "I’m listening, tell me more.",
+    "The silence is thick; what happens next?",
+    "Your story unfolds with every word you speak."
+  ]);
+}
+
+function randomChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 </body>
 </html>
