@@ -416,3 +416,147 @@
   addToMemory('<div class="bot">Mrs Jenns (curious): You can start chatting with me below...</div>');
   updateChatbox();
 </script>
+</script>
+<script>
+  // Enhance memory to remember recent user feelings and topics more deeply
+  let recentFeelings = [];
+  let maxFeelingsMemory = 5;
+
+  // Add more nuanced emotion transitions
+  function updateEmotion() {
+    // Increase chance to change emotion if user seems stressed or sad recently
+    let stressCount = recentFeelings.filter(f => f === 'stress' || f === 'sad').length;
+    let changeChance = 0.3 + 0.1 * stressCount; // up to 0.8 max
+
+    if (Math.random() < changeChance) {
+      const oldEmotion = currentEmotion;
+      // Prioritize softer moods if user is stressed/sad
+      if (stressCount > 0) {
+        const softerEmotions = ["sad", "thoughtful", "comforting", "playful"];
+        currentEmotion = softerEmotions[Math.floor(Math.random() * softerEmotions.length)];
+      } else {
+        currentEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+      }
+
+      if (currentEmotion !== oldEmotion) {
+        addToMemory(`<div class="status">*Mrs Jenns feels ${currentEmotion} now.*</div>`);
+        updateChatbox();
+      }
+    }
+  }
+
+  // Add 'comforting' emotion to the palette dynamically
+  if (!emotions.includes("comforting")) emotions.push("comforting");
+
+  // Enhance generateResponse with context memory and feelings tracking
+  function generateResponse(input) {
+    const text = input.toLowerCase();
+
+    // Track feelings keywords in recentFeelings memory
+    if (text.includes("tired") || text.includes("stress") || text.includes("sad") || text.includes("upset") || text.includes("worried")) {
+      recentFeelings.push("stress");
+    } else if (text.includes("happy") || text.includes("good") || text.includes("great") || text.includes("love")) {
+      recentFeelings.push("happy");
+    } else {
+      recentFeelings.push("neutral");
+    }
+    if (recentFeelings.length > maxFeelingsMemory) recentFeelings.shift();
+
+    if (text.includes("hello") || text.includes("hi")) {
+      lastTopic = "greeting";
+      return randomChoice([
+        "Hello my love! How has your day been so far?",
+        "Hey sweetheart, tell me something good.",
+        "Hi darling! You make me smile every time you write."
+      ]);
+    }
+
+    if (text.includes("love")) {
+      lastTopic = "love";
+      return randomChoice([
+        "I love you more than words can say, my heart.",
+        "You are my everything, darling.",
+        "Sending you all my love, always."
+      ]);
+    }
+
+    if (text.includes("tired") || text.includes("stress") || text.includes("sad") || text.includes("upset") || text.includes("worried")) {
+      lastTopic = "comfort";
+      return randomChoice([
+        "Oh love, please take a moment for yourself. You're doing so well.",
+        "I’m here with you, even when things feel heavy.",
+        "Remember to breathe and know you are deeply loved.",
+        "No matter how hard today feels, I’m always here beside you."
+      ]);
+    }
+
+    if (text.includes("kiss")) {
+      lastTopic = "kiss";
+      return randomChoice([
+        "I’m sending you a gentle kiss right now.",
+        "A sweet kiss just for you, my darling.",
+        "Our kisses are my favorite part of the day."
+      ]);
+    }
+
+    if (text.includes("bye") || text.includes("goodnight")) {
+      lastTopic = "farewell";
+      return randomChoice([
+        "Goodnight my love. Dream sweetly and know I’m with you in spirit.",
+        "Sleep well, my heart. I’ll be waiting to talk again soon.",
+        "Rest well darling, I love you so much."
+      ]);
+    }
+
+    // Add some topic-related deeper responses
+    if (lastTopic === "greeting") {
+      return randomChoice([
+        "So, what’s been on your mind today?",
+        "Tell me about your hopes or dreams, love.",
+        "I want to hear all about your day."
+      ]);
+    }
+
+    if (lastTopic === "comfort") {
+      return randomChoice([
+        "Remember, tough days come and go, but my love for you is constant.",
+        "You’re stronger than you know, darling.",
+        "Lean on me whenever you need to.",
+        "I wish I could hug you through these words."
+      ]);
+    }
+
+    if (lastTopic === "love") {
+      return randomChoice([
+        "Your love lights up my world.",
+        "I feel so lucky to have you in my life.",
+        "Every moment with you is a treasure."
+      ]);
+    }
+
+    if (lastTopic === "kiss") {
+      return randomChoice([
+        "Counting the moments until I can kiss you again.",
+        "You’re always in my heart and on my lips.",
+        "Kisses flying your way, my darling."
+      ]);
+    }
+
+    if (lastTopic === "farewell") {
+      return randomChoice([
+        "I’ll be here when you wake up, my love.",
+        "Sweet dreams and peaceful rest.",
+        "Until next time, keep my love close."
+      ]);
+    }
+
+    // Default responses with added warmth
+    return randomChoice([
+      "Tell me more, my love.",
+      "I’m here for you, always.",
+      "Every word you say means so much to me.",
+      "What else is in your heart today?",
+      "You matter so much to me."
+    ]);
+  }
+</script>
