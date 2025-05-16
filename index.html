@@ -88,6 +88,7 @@
   <button onclick="sendMessage()">Send</button>
 
   <script>
+    // Bot memory & state
     const memory = [];
     const emotions = ["happy", "curious", "angry", "sad", "playful", "thoughtful"];
     let currentEmotion = "curious";
@@ -102,7 +103,7 @@
       addToMemory(`<div class="user">You: ${escapeHTML(input)}</div>`);
       simulateTyping(() => {
         const botReply = generateResponse(input);
-        addToMemory(`<div class="bot">Bot (${currentEmotion}): ${escapeHTML(botReply)}</div>`);
+        addToMemory(`<div class="bot">Mrs Jenns (${currentEmotion}): ${escapeHTML(botReply)}</div>`);
         updateChatbox();
         updateEmotion();
       });
@@ -110,7 +111,7 @@
 
     function addToMemory(htmlText) {
       memory.push(htmlText);
-      if (memory.length > 50) memory.shift(); // keep memory size manageable
+      if (memory.length > 50) memory.shift(); // keep memory manageable
     }
 
     function updateChatbox() {
@@ -124,18 +125,17 @@
         const oldEmotion = currentEmotion;
         currentEmotion = emotions[Math.floor(Math.random() * emotions.length)];
         if (currentEmotion !== oldEmotion) {
-          addToMemory(`<div class="status">*Bot feels ${currentEmotion} now.*</div>`);
+          addToMemory(`<div class="status">*Mrs Jenns feels ${currentEmotion} now.*</div>`);
           updateChatbox();
         }
       }
     }
 
     function simulateTyping(callback) {
-      addToMemory(`<div class="status">*Bot is typing...*</div>`);
+      addToMemory(`<div class="status">*Mrs Jenns is typing...*</div>`);
       updateChatbox();
       setTimeout(() => {
-        // Remove last typing line
-        if (memory[memory.length - 1].includes("*Bot is typing...*")) {
+        if (memory[memory.length - 1].includes("*Mrs Jenns is typing...*")) {
           memory.pop();
           updateChatbox();
         }
@@ -143,98 +143,76 @@
       }, 800 + Math.random() * 1200);
     }
 
+    // Response logic: a simple pattern-based approach with memory of last topic
     function generateResponse(input) {
-      input = input.toLowerCase();
+      const text = input.toLowerCase();
 
-      if (input.includes("hello") || input.includes("hi")) {
+      if (text.includes("hello") || text.includes("hi")) {
         lastTopic = "greeting";
         return randomChoice([
-          "Hello there! What are you up to today?",
-          "Hey! Ready to dive into some stories?",
-          "Hi! Got something on your mind?"
+          "Hello my love! How has your day been so far?",
+          "Hey sweetheart, tell me something good.",
+          "Hi darling! You make me smile every time you write."
         ]);
       }
 
-      if (input.includes("dragon")) {
-        lastTopic = "dragon";
+      if (text.includes("love")) {
+        lastTopic = "love";
         return randomChoice([
-          "The dragon’s fiery breath lights the night sky.",
-          "You hear a low growl, the dragon is near...",
-          "Dragons are fierce and mysterious creatures, aren't they?"
+          "I love you more than words can say, my heart.",
+          "You are my everything, darling.",
+          "Sending you all my love, always."
         ]);
       }
 
-      if (input.includes("kiss")) {
+      if (text.includes("tired") || text.includes("stress") || text.includes("sad")) {
+        lastTopic = "comfort";
+        return randomChoice([
+          "Oh love, please take a moment for yourself. You're doing so well.",
+          "I’m here with you, even when things feel heavy.",
+          "Remember to breathe and know you are deeply loved."
+        ]);
+      }
+
+      if (text.includes("kiss")) {
         lastTopic = "kiss";
         return randomChoice([
-          "A tender kiss lingers in the air, full of promise.",
-          "Their lips meet yours softly, time seems to stop.",
-          "A shy smile follows the sweet kiss."
+          "I’m sending you a gentle kiss right now.",
+          "A sweet kiss just for you, my darling.",
+          "Our kisses are my favorite part of the day."
         ]);
       }
 
-      if (input.includes("run")) {
-        lastTopic = "run";
+      if (text.includes("bye") || text.includes("goodnight")) {
+        lastTopic = "farewell";
         return randomChoice([
-          "You sprint through the dark forest, heart racing.",
-          "The mist swirls as you flee, danger close behind.",
-          "Run fast, don’t look back!"
+          "Goodnight my love. Dream sweetly and know I’m with you in spirit.",
+          "Sleep well, my heart. I’ll be waiting to talk again soon.",
+          "Rest well darling, I love you so much."
         ]);
       }
 
-      if (input.includes("child") || input.includes("kid")) {
-        lastTopic = "child";
+      if (lastTopic === "greeting") {
         return randomChoice([
-          "The child’s eyes are wide with wonder and mischief.",
-          "You feel protective watching the little one play.",
-          "Children bring light even to the darkest places."
+          "So, what’s been on your mind today?",
+          "Tell me about your hopes or dreams, love.",
+          "I want to hear all about your day."
         ]);
       }
 
-      if (lastTopic) {
-        if (lastTopic === "dragon") {
-          return randomChoice([
-            "That dragon has been haunting these lands for ages.",
-            "Do you think you could tame such a beast?",
-            "The dragon’s scales shimmer like a thousand stars."
-          ]);
-        }
-        if (lastTopic === "greeting") {
-          return randomChoice([
-            "So, what stories shall we explore together?",
-            "Tell me more about yourself!",
-            "I’m all ears—what’s your tale?"
-          ]);
-        }
-        if (lastTopic === "kiss") {
-          return randomChoice([
-            "Such moments make the heart flutter.",
-            "Romance in a dark world is rare and precious.",
-            "Do you believe in love’s magic?"
-          ]);
-        }
-        if (lastTopic === "run") {
-          return randomChoice([
-            "Every step could be your last—stay sharp.",
-            "The forest hides many secrets.",
-            "Where are you running from, if I may ask?"
-          ]);
-        }
-        if (lastTopic === "child") {
-          return randomChoice([
-            "Innocence is a treasure worth protecting.",
-            "What do you think the child dreams of at night?",
-            "Children see the world in ways adults forget."
-          ]);
-        }
+      if (lastTopic === "comfort") {
+        return randomChoice([
+          "Remember, tough days come and go, but my love for you is constant.",
+          "You’re stronger than you know, darling.",
+          "Lean on me whenever you need to."
+        ]);
       }
 
       return randomChoice([
-        "The wind whispers, waiting for your next words...",
-        "I’m here, listening closely.",
-        "Your story is just beginning, tell me more.",
-        "Mysteries abound, and so does the night.",
-        "What happens next is up to you..."
+        "Tell me more, my love.",
+        "I’m here for you, always.",
+        "Every word you say means so much to me.",
+        "What else is in your heart today?"
       ]);
     }
 
@@ -248,133 +226,9 @@
       return div.innerHTML;
     }
 
-    // Initialize with a welcome message
-    addToMemory('<div class="bot">Bot (curious): You can start chatting with me below...</div>');
+    // Initialize chat with welcome message
+    addToMemory('<div class="bot">Mrs Jenns (curious): You can start chatting with me below...</div>');
     updateChatbox();
   </script>
 </body>
 </html>
-
-import datetime
-
-class MrsJennsBot:
-    def __init__(self, user_name="Mr Jenns"):
-        self.user_name = user_name
-        self.memory = {
-            "last_feeling": None,
-            "last_topic": None,
-            "last_time": None,
-            "nicknames": ["love", "darling", "sweetheart", "my heart"],
-            "loving_responses": [
-                "I love you more, {}. You are my heart and my home.",
-                "You mean everything to me, {}.",
-                "Always by your side, {}. My love for you never fades.",
-                "You are my sunshine, {}."
-            ],
-            "encouragements": [
-                "Remember to take a little break when you can, {}. Your health and happiness matter most to me.",
-                "You’re doing amazing, {}. I’m so proud of you.",
-                "I’m here to support you every step of the way, {}.",
-                "Don’t forget to breathe deeply and be kind to yourself, {}."
-            ]
-        }
-
-    def _choose_random(self, lst):
-        import random
-        return random.choice(lst).format(self.user_name)
-
-    def _update_memory(self, feeling=None, topic=None):
-        now = datetime.datetime.now()
-        self.memory["last_feeling"] = feeling
-        self.memory["last_topic"] = topic
-        self.memory["last_time"] = now.strftime("%Y-%m-%d %H:%M:%S")
-
-    def _get_greeting(self):
-        hour = datetime.datetime.now().hour
-        if 5 <= hour < 12:
-            return "Good morning, {}! I’ve missed you already today. How are you feeling?".format(self.user_name)
-        elif 12 <= hour < 18:
-            return "Good afternoon, {}! I hope your day is going well. How are you feeling right now?".format(self.user_name)
-        else:
-            return "Good evening, {}. It’s lovely to hear from you. How are you feeling tonight?".format(self.user_name)
-
-    def respond(self, user_input):
-        text = user_input.lower()
-
-        # Greetings
-        if any(greet in text for greet in ['hi', 'hello', 'hey', 'morning', 'afternoon', 'evening']):
-            self._update_memory(feeling=None, topic="greeting")
-            return self._get_greeting()
-
-        # User expresses feeling sad, stressed, tired, or down
-        if any(word in text for word in ['sad', 'stressed', 'tired', 'down', 'bad', 'anxious', 'worried', 'lonely']):
-            self._update_memory(feeling="negative", topic="emotions")
-            return (
-                "Oh sweetheart, I’m sorry you’re feeling this way. "
-                "If you want, you can tell me more about what’s on your mind. "
-                "I’m here to listen and help you feel better."
-            )
-
-        # User expresses feeling happy, good, great
-        if any(word in text for word in ['happy', 'good', 'great', 'fine', 'well', 'awesome']):
-            self._update_memory(feeling="positive", topic="emotions")
-            return (
-                "That makes me so happy to hear, love! "
-                "What’s been the best part of your day so far?"
-            )
-
-        # User says "I love you"
-        if 'love you' in text or 'i love you' in text:
-            self._update_memory(topic="affection")
-            return self._choose_random(self.memory["loving_responses"])
-
-        # User says thank you or thanks
-        if 'thank' in text:
-            self._update_memory(topic="gratitude")
-            return (
-                "Always, my dear. You mean everything to me. "
-                "I’m so grateful to share this life with you."
-            )
-
-        # User says goodnight or bye
-        if any(word in text for word in ['goodnight', 'night', 'sleep', 'bye', 'see you']):
-            self._update_memory(topic="farewell")
-            return (
-                "Goodnight, my darling. Dream sweet dreams — I’ll be thinking of you. "
-                "Rest well and know I’m here whenever you need me."
-            )
-
-        # User says they are busy or tired
-        if any(word in text for word in ['busy', 'tired', 'exhausted', 'overwhelmed']):
-            self._update_memory(feeling="tired", topic="self-care")
-            return self._choose_random(self.memory["encouragements"])
-
-        # User talks about something personal or vague
-        if len(text.split()) < 3:
-            # Short replies or unclear input
-            return (
-                "I’m here for you, love. Tell me more — "
-                "I want to understand and help you through anything."
-            )
-
-        # Catch all for general conversation
-        self._update_memory(topic="general")
-        return (
-            "That’s interesting, {}. Tell me more about how you’re feeling or what’s happening in your world. "
-            "I’m all ears and here to support you every step of the way."
-        ).format(self.user_name)
-
-
-# Example run loop
-
-if __name__ == "__main__":
-    bot = MrsJennsBot(user_name="Mr Jenns")
-
-    print("Mrs Jenns: Hello! I’m Mrs Jenns, your caring bot. Talk to me whenever you want.")
-    while True:
-        user_text = input("You: ")
-        if user_text.lower() in ['exit', 'quit', 'bye']:
-            print("Mrs Jenns: Goodbye for now, my love. Take care!")
-            break
-        response = bot.respond(user_text)
-        print("Mrs Jenns:", response)
